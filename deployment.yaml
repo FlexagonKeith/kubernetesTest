@@ -1,18 +1,27 @@
-apiVersion: apps/v1
 kind: Deployment
+apiVersion: apps/v1
 metadata:
-  name: ${{FD_KN_DEPLOYMENT_NAME}}
+    name: nginx-deployment
 spec:
-  replicas: 1
-  template:
-    metadata:
-       labels:
-         app: superapp
-         fd_deployment_name: ${{FD_KN_DEPLOYMENT_NAME}}
-         fd_app_name: SpringBoot
-    spec:
-      containers:
-        - name: superapp
-          image: ${{FD_PROJECT_DOCKER_IMAGE_NAME}}
-          ports:
-            - containerPort: 8080
+    #A deployment's specification really only has a few useful options
+    # 1. How many copies of each pod do we want?
+    replicas: 3
+    # 2. How do we want to update the pods?
+    strategy: Recreate
+    # 3. Which pods are manged by this deployment?
+    selector:
+        # This must match the labels we set on the pod!
+        matchLabels:
+        deploy: example
+
+        #This template field is a regular pod configuration nested inside the deployment spec
+        template:
+            metadata:
+            #Set labels on the pod.
+            #This is used in the deployment selector.
+            labels:
+                deploy: example
+            spec:
+                containers:
+                    -name: nginx
+                    image: nginx:1.7.9
